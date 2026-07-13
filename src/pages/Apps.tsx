@@ -4,13 +4,13 @@ import { useT } from "@/lib/i18n/I18nProvider";
 
 // Only apps with a real public deploy get a "live" launch button; the rest stay
 // "atelier" with no link. Never ship a localhost URL here — it 404s for everyone
-// but the developer. Update the url + flip to "live" once Hermes/Chiron deploy.
+// but the developer.
 const APPS = [
   { name: "Chronos", url: "https://chronos-plannerai.vercel.app", color: "#0E2A47", status: "live" as const },
   { name: "Kairos", url: "https://kairos-suite.vercel.app", color: "#7D4E8C", status: "live" as const },
   { name: "Pluto", url: "https://pluto-suite.vercel.app", color: "#183427", status: "live" as const },
-  { name: "Hermes", url: "#", color: "#3EB8CC", status: "atelier" as const },
-  { name: "Chiron", url: "#", color: "#A63446", status: "atelier" as const },
+  { name: "Hermes", url: "https://hermes-seven-delta.vercel.app", color: "#3EB8CC", status: "live" as const },
+  { name: "Chiron", url: "https://chiron-nine.vercel.app", color: "#A63446", status: "live" as const },
 ];
 
 export default function Apps() {
