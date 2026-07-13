@@ -1,0 +1,179 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Olympus design system — warm marble graphite + neutral gilt chrome.
+   Sibling of Chronos (midnight + bronze), Kairos (twilight + rose-gold),
+   Pluto (vault green + gold), Hermes (graphite + cyan), Chiron (sepia +
+   crimson): same paper, same cards, same type — but Olympus is deliberate
+   greyscale: it reflects its siblings' colors and contributes none of its
+   own. "Borrowed light." */
+
+@layer base {
+  :root {
+    --background: 39 33% 95%;
+    --foreground: 30 8% 18%;           /* warm marble graphite #2E2A26 */
+
+    --surface-raised: 38 40% 97%;
+    --surface-veil: 39 22% 88%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 30 8% 18%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 8% 18%;
+
+    --primary: 30 8% 18%;              /* marble graphite #2E2A26 */
+    --primary-foreground: 39 33% 95%;
+    --primary-deep: 30 10% 10%;         /* near-black marble #1A1714 */
+    --primary-glow: 30 6% 30%;
+
+    --secondary: 38 30% 72%;            /* neutral gilt #C9B99A */
+    --secondary-foreground: 30 8% 10%;
+    --secondary-soft: 38 40% 82%;       /* pale gilt */
+
+    --muted: 39 22% 90%;
+    --muted-foreground: 30 6% 36%;
+
+    --accent: 38 30% 72%;
+    --accent-foreground: 30 8% 10%;
+
+    --neutral-veil: 39 22% 82%;
+
+    --destructive: 8 62% 44%;
+    --destructive-foreground: 39 33% 97%;
+
+    --border: 39 18% 84%;
+    --input: 39 18% 84%;
+    --ring: 38 30% 72%;
+
+    --radius: 0.625rem;
+
+    /* Sidebar — strongly marble */
+    --sidebar-background: 30 10% 10%;
+    --sidebar-foreground: 38 14% 84%;
+    --sidebar-primary: 38 30% 72%;
+    --sidebar-primary-foreground: 30 10% 10%;
+    --sidebar-accent: 30 8% 16%;
+    --sidebar-accent-foreground: 39 33% 95%;
+    --sidebar-border: 30 6% 18%;
+    --sidebar-ring: 38 30% 72%;
+
+    --gradient-summit: linear-gradient(160deg, hsl(30 10% 10%) 0%, hsl(30 8% 14%) 60%, hsl(30 6% 20%) 100%);
+    --gradient-gilt: linear-gradient(135deg, hsl(38 40% 82%) 0%, hsl(38 30% 72%) 100%);
+    --gradient-parchment: radial-gradient(1200px 600px at 80% -10%, hsl(38 40% 75% / 0.10), transparent 60%),
+                          radial-gradient(900px 500px at -10% 110%, hsl(30 8% 18% / 0.06), transparent 60%),
+                          linear-gradient(180deg, hsl(39 35% 96%), hsl(39 33% 93%));
+
+    --shadow-soft: 0 1px 2px hsl(30 8% 18% / 0.04), 0 8px 24px -12px hsl(30 8% 18% / 0.12);
+    --shadow-elevated: 0 2px 4px hsl(30 8% 18% / 0.06), 0 24px 48px -20px hsl(30 8% 18% / 0.22);
+    --shadow-gilt: 0 10px 30px -12px hsl(38 30% 72% / 0.40);
+
+    --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .dark {
+    --background: 30 8% 6%;
+    --foreground: 38 12% 90%;
+
+    --surface-raised: 30 6% 10%;
+    --surface-veil:   30 6% 13%;
+
+    --card: 30 6% 8%;
+    --card-foreground: 38 12% 90%;
+
+    --popover: 30 6% 8%;
+    --popover-foreground: 38 12% 90%;
+
+    --primary: 38 30% 72%;              /* gilt becomes lead in dark */
+    --primary-foreground: 30 8% 6%;
+    --primary-deep: 38 24% 50%;
+    --primary-glow: 38 40% 84%;
+
+    --secondary: 38 30% 72%;
+    --secondary-foreground: 30 8% 6%;
+    --secondary-soft: 38 40% 84%;
+
+    --muted: 30 4% 17%;
+    --muted-foreground: 38 10% 70%;
+
+    --accent: 38 30% 72%;
+    --accent-foreground: 30 8% 6%;
+
+    --neutral-veil: 30 4% 20%;
+
+    --destructive: 8 70% 55%;
+    --destructive-foreground: 39 30% 96%;
+
+    --border: 30 4% 16%;
+    --input: 30 4% 16%;
+    --ring: 38 30% 72%;
+
+    --sidebar-background: 30 10% 4.5%;
+    --sidebar-foreground: 38 14% 82%;
+    --sidebar-primary: 38 30% 72%;
+    --sidebar-primary-foreground: 30 8% 6%;
+    --sidebar-accent: 30 6% 10%;
+    --sidebar-accent-foreground: 38 20% 95%;
+    --sidebar-border: 30 4% 14%;
+    --sidebar-ring: 38 30% 72%;
+
+    --gradient-summit: linear-gradient(160deg, hsl(30 10% 4.5%) 0%, hsl(30 8% 10%) 60%, hsl(30 6% 16%) 100%);
+    --gradient-gilt: linear-gradient(135deg, hsl(38 40% 84%) 0%, hsl(38 30% 56%) 100%);
+    --gradient-parchment: radial-gradient(1200px 600px at 80% -10%, hsl(38 30% 72% / 0.08), transparent 60%),
+                          radial-gradient(900px 500px at -10% 110%, hsl(30 8% 28% / 0.14), transparent 60%),
+                          linear-gradient(180deg, hsl(30 8% 6%), hsl(30 6% 7%));
+
+    --shadow-soft: 0 1px 2px hsl(0 0% 0% / 0.4), 0 8px 24px -12px hsl(0 0% 0% / 0.55);
+    --shadow-elevated: 0 2px 4px hsl(0 0% 0% / 0.45), 0 24px 48px -20px hsl(0 0% 0% / 0.7);
+    --shadow-gilt: 0 10px 30px -12px hsl(38 30% 56% / 0.45);
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  html { height: 100%; }
+  body { min-height: 100%; }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    font-feature-settings: "ss01","cv11";
+  }
+  .font-display { font-family: 'Fraunces', ui-serif, Georgia, serif; font-optical-sizing: auto; letter-spacing: -0.02em; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .olympus-surface { background: var(--gradient-parchment); }
+  .olympus-card {
+    @apply bg-card rounded-xl border;
+    box-shadow: var(--shadow-soft);
+  }
+  .olympus-card-elevated {
+    @apply bg-card rounded-xl border;
+    box-shadow: var(--shadow-elevated);
+  }
+  .gilt-rule {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(var(--secondary) / 0.6), transparent);
+  }
+  .hairline { border-color: hsl(var(--border)); }
+  .num { font-variant-numeric: tabular-nums; }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .bg-gilt { background: var(--gradient-gilt); }
+  .bg-summit { background: var(--gradient-summit); }
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-elevated { box-shadow: var(--shadow-elevated); }
+  .shadow-gilt { box-shadow: var(--shadow-gilt); }
+  .ring-gilt { box-shadow: 0 0 0 1px hsl(var(--secondary) / 0.4); }
+}
