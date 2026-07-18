@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   BookOpen, Check, Clock, Copy, GraduationCap, History, LayoutDashboard, Loader2,
-  MessageSquareQuote, Send, Settings2, Sparkles, Square, Volume2, Wallet,
+  MessageSquareQuote, Send, Sparkles, Square, Volume2, Wallet,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -10,8 +11,8 @@ import { useI18n, useT } from "@/lib/i18n/I18nProvider";
 import { cn } from "@/lib/utils";
 import { streamChat, type ChatMessage } from "@/lib/ai/providers";
 import {
-  DEFAULT_MODELS, PROVIDER_LABELS, loadAiSettings, saveAiSettings,
-  type AiProvider, type AiSettings,
+  DEFAULT_MODELS, PROVIDER_LABELS, loadAiSettings,
+  type AiSettings,
 } from "@/lib/ai/settings";
 import { refreshContext } from "@/lib/ai/context";
 import { parseChronos } from "@/lib/views/chronos";
@@ -136,8 +137,7 @@ export default function Oracle() {
   const [loading, setLoading] = useState(false);
   const [sidebarTab, setSidebarTab] = useState<"overview" | "digest" | "history">("overview");
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [settings, setSettings] = useState<AiSettings>(loadAiSettings);
+  const [settings] = useState<AiSettings>(loadAiSettings);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -148,12 +148,6 @@ export default function Oracle() {
   }, [messages, streamingText]);
 
   useEffect(() => () => window.speechSynthesis?.cancel(), []);
-
-  const updateSettings = (patch: Partial<AiSettings>) => {
-    const next = { ...settings, ...patch };
-    setSettings(next);
-    saveAiSettings(next);
-  };
 
   const systemPrompt = useMemo(() => refreshContext(), [messages.length]);
   const usedTokens = useMemo(() => {
@@ -241,56 +235,7 @@ export default function Oracle() {
             <h1 className="font-display text-2xl text-primary">{o.title}</h1>
             <p className="mt-1 text-sm text-muted-foreground">{o.lead}</p>
           </div>
-          <button
-            type="button"
-            onClick={() => setSettingsOpen((v) => !v)}
-            className={cn(
-              "grid h-9 w-9 shrink-0 place-items-center rounded-md border border-border bg-card text-muted-foreground transition-colors hover:text-foreground",
-              settingsOpen && "border-secondary text-secondary",
-            )}
-            aria-label="AI settings"
-          >
-            <Settings2 className="h-4 w-4" />
-          </button>
         </div>
-
-        {settingsOpen && (
-          <div className="mb-4 flex shrink-0 flex-wrap items-end gap-3 rounded-xl border border-border bg-card p-4">
-            <label className="flex flex-col gap-1 text-[10px] uppercase tracking-widest text-muted-foreground">
-              Provider
-              <select
-                value={settings.provider}
-                onChange={(e) => updateSettings({ provider: e.target.value as AiProvider, model: "" })}
-                className="rounded-md border border-border bg-surface-raised px-2 py-1.5 text-sm text-foreground"
-              >
-                {Object.entries(PROVIDER_LABELS).map(([id, label]) => (
-                  <option key={id} value={id}>{label}</option>
-                ))}
-              </select>
-            </label>
-            {settings.provider !== "gemini-hosted" && settings.provider !== "openrouter-hosted" && settings.provider !== "ollama" && (
-              <label className="flex flex-1 flex-col gap-1 text-[10px] uppercase tracking-widest text-muted-foreground">
-                API key
-                <input
-                  type="password"
-                  value={settings.apiKey}
-                  onChange={(e) => updateSettings({ apiKey: e.target.value })}
-                  placeholder="sk-…"
-                  className="rounded-md border border-border bg-surface-raised px-2 py-1.5 text-sm text-foreground"
-                />
-              </label>
-            )}
-            <label className="flex flex-col gap-1 text-[10px] uppercase tracking-widest text-muted-foreground">
-              Model
-              <input
-                value={settings.model}
-                onChange={(e) => updateSettings({ model: e.target.value })}
-                placeholder={DEFAULT_MODELS[settings.provider]}
-                className="w-48 rounded-md border border-border bg-surface-raised px-2 py-1.5 text-sm text-foreground"
-              />
-            </label>
-          </div>
-        )}
 
         <ScrollArea className="flex-1 pr-4">
           {messages.length === 0 && (
@@ -352,7 +297,9 @@ export default function Oracle() {
 
         <div className="border-t border-border pt-3">
           <div className="mb-2 flex items-center justify-between text-[10px] text-muted-foreground">
-            <span>{PROVIDER_LABELS[settings.provider]} · {settings.model.trim() || DEFAULT_MODELS[settings.provider]}</span>
+            <Link to="/settings" className="hover:text-foreground">
+              via {PROVIDER_LABELS[settings.provider]} · {settings.model.trim() || DEFAULT_MODELS[settings.provider]}
+            </Link>
             <span className="num" title={`${usedTokens} tokens (estimado)`}>
               {contextPct}% contexto · {usedTokens.toLocaleString()} tokens (estimado)
             </span>

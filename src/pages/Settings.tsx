@@ -1,9 +1,15 @@
 import { useState } from "react";
+import { Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useAuth } from "@/lib/auth";
+import {
+  DEFAULT_MODELS, PROVIDER_LABELS, loadAiSettings, saveAiSettings,
+  type AiProvider, type AiSettings,
+} from "@/lib/ai/settings";
 import { useT, useI18n, type Locale } from "@/lib/i18n/I18nProvider";
 import { usePrefs } from "@/lib/prefs/store";
 import { useTheme } from "@/lib/theme/ThemeProvider";
@@ -20,6 +26,15 @@ export default function Settings() {
   const [displayName, setDisplayName] = useState(session?.name || "");
   const [saving, setSaving] = useState(false);
   const isCloud = !!session?.email;
+  const [ai, setAi] = useState<AiSettings>(loadAiSettings);
+
+  function patchAi(patch: Partial<AiSettings>) {
+    setAi((prev) => {
+      const next = { ...prev, ...patch };
+      saveAiSettings(next);
+      return next;
+    });
+  }
 
   const [widgets, setWidgets] = useState<Record<string, boolean>>(() => {
     const saved = localStorage.getItem("olympus.widgets");
@@ -74,6 +89,50 @@ export default function Settings() {
             <Button variant={theme === "light" ? "default" : "outline"} size="sm" onClick={() => handleTheme("light")}>{s.parchment}</Button>
             <Button variant={theme === "dark" ? "default" : "outline"} size="sm" onClick={() => handleTheme("dark")}>{s.summit}</Button>
           </div>
+        </div>
+      </section>
+
+      <section className="mb-10">
+        <p className="mb-2 text-xs uppercase tracking-[0.22em] text-secondary">{s.aetherisEyebrow}</p>
+        <div className="olympus-card p-5">
+          <h3 className="mb-3 font-display text-base text-primary">{s.aetherisTitle}</h3>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{s.provider}</Label>
+              <Select value={ai.provider} onValueChange={(v) => patchAi({ provider: v as AiProvider, model: "" })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {(Object.keys(PROVIDER_LABELS) as AiProvider[]).map((p) => (
+                    <SelectItem key={p} value={p}>{PROVIDER_LABELS[p]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ai-model" className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{s.model}</Label>
+              <Input id="ai-model" value={ai.model} onChange={(e) => patchAi({ model: e.target.value })} placeholder={DEFAULT_MODELS[ai.provider]} disabled={ai.provider === "gemini-hosted" || ai.provider === "openrouter-hosted"} />
+            </div>
+            {ai.provider === "gemini-hosted" || ai.provider === "openrouter-hosted" ? (
+              <div className="flex items-center gap-2 rounded-md border border-secondary/30 bg-secondary/10 p-3 text-xs text-muted-foreground sm:col-span-2">
+                <Sparkles className="h-3.5 w-3.5 shrink-0 text-secondary" />
+                {s.hostedNote}
+              </div>
+            ) : ai.provider !== "ollama" ? (
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="ai-key" className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{s.apiKey}</Label>
+                <Input id="ai-key" type="password" value={ai.apiKey} onChange={(e) => patchAi({ apiKey: e.target.value })} placeholder={s.apiKeyPlaceholder} />
+              </div>
+            ) : (
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="ai-url" className="text-xs uppercase tracking-[0.18em] text-muted-foreground">{s.ollamaUrl}</Label>
+                <Input id="ai-url" value={ai.baseUrl} onChange={(e) => patchAi({ baseUrl: e.target.value })} placeholder="http://localhost:11434" />
+              </div>
+            )}
+          </div>
+          <p className="mt-3 flex items-center gap-1.5 text-[11px] text-muted-foreground">
+            <Sparkles className="h-3 w-3 text-secondary" />
+            {s.keysNote}
+          </p>
         </div>
       </section>
 
