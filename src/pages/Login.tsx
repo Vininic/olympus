@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Logo, { OlympusMark } from "@/components/OlympusLogo";
+import Logo, { OlympusMark } from "@/components/brand/OlympusMark";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Column3D } from "@/components/three/Column";
+import { Monolith3D } from "@/components/three/Monolith";
 import { useAuth } from "@/lib/auth";
 import { useT } from "@/lib/i18n/I18nProvider";
 import { cn } from "@/lib/utils";
@@ -28,7 +28,7 @@ export default function Login() {
   // Redirect an already-signed-in user off the login page — in an effect, not
   // during render (calling navigate() mid-render warns and can loop).
   useEffect(() => {
-    if (session) navigate("/desk", { replace: true });
+    if (session) navigate("/app", { replace: true });
   }, [session, navigate]);
   if (session) return null;
 
@@ -39,7 +39,7 @@ export default function Login() {
     try {
       if (mode === "local") {
         await signIn(name);
-        navigate("/desk", { replace: true });
+        navigate("/app", { replace: true });
         return;
       }
       if (!email || !password) { setError(l.needsEmailPass); setLoading(false); return; }
@@ -53,7 +53,7 @@ export default function Login() {
       } else if (res) {
         setError(res);
       } else {
-        navigate("/desk", { replace: true });
+        navigate("/app", { replace: true });
       }
     } finally {
       setLoading(false);
@@ -67,7 +67,7 @@ export default function Login() {
       <div className="bg-summit relative hidden flex-col p-10 text-primary-foreground lg:flex">
         <Logo variant="light" />
         <div className="grid flex-1 place-items-center">
-          <Column3D />
+          <Monolith3D compact className="h-64 w-64" />
         </div>
         <p className="max-w-sm text-sm leading-relaxed text-sidebar-foreground/80">{l.heroTagline ?? l.title}</p>
       </div>

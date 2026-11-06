@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { DEFAULT_LOCALE, DICTIONARIES, LOCALE_LABELS, SUPPORTED_LOCALES, type Dictionary, type Locale } from "./dictionaries";
+import { HUB_DICTIONARIES, type HubDictionary } from "./hub";
 
 export type { Locale };
 
@@ -51,4 +52,11 @@ export function useI18n(): I18nContextValue {
 
 export function useT(): Dictionary {
   return useI18n().dict;
+}
+
+/** The hub surface's own vocabulary (Home, Chat, Files, Apps, Account,
+ *  Settings). Separate from `useT` so the rewrite's strings do not have to be
+ *  threaded through the original prototype's dictionary shape. */
+export function useHub(): HubDictionary {
+  return HUB_DICTIONARIES[useI18n().locale];
 }

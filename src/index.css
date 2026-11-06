@@ -177,3 +177,309 @@
   .shadow-gilt { box-shadow: var(--shadow-gilt); }
   .ring-gilt { box-shadow: 0 0 0 1px hsl(var(--secondary) / 0.4); }
 }
+
+/* ── Skins ────────────────────────────────────────────────────────────────────
+   Marble is the base declared above; each skin below states only its deltas,
+   in both light and dark. A skin never redefines a token in one theme only —
+   that is how a palette ends up unreadable when the user flips the mode. */
+
+@layer base {
+  /* Nocturne — cool, high-contrast, gilt runs brighter. */
+  [data-skin="nocturne"] {
+    --background: 220 16% 94%;
+    --surface-raised: 220 20% 97%;
+    --surface-veil: 220 14% 88%;
+    --foreground: 220 18% 14%;
+    --primary: 220 18% 14%;
+    --primary-deep: 220 22% 8%;
+    --secondary: 42 44% 62%;
+    --secondary-soft: 42 52% 74%;
+    --accent: 42 44% 62%;
+    --muted: 220 14% 90%;
+    --muted-foreground: 220 10% 34%;
+    --border: 220 12% 84%;
+    --input: 220 12% 84%;
+    --ring: 42 44% 62%;
+    --card: 0 0% 100%;
+    --sidebar-background: 220 22% 8%;
+    --sidebar-accent: 220 16% 15%;
+    --sidebar-border: 220 14% 17%;
+    --gradient-parchment: radial-gradient(1200px 600px at 80% -10%, hsl(42 44% 62% / 0.10), transparent 60%),
+                          linear-gradient(180deg, hsl(220 16% 96%), hsl(220 16% 92%));
+  }
+  [data-skin="nocturne"].dark {
+    --background: 220 22% 5%;
+    --surface-raised: 220 18% 9%;
+    --surface-veil: 220 16% 12%;
+    --foreground: 220 14% 92%;
+    --card: 220 18% 7%;
+    --primary: 42 52% 68%;
+    --primary-deep: 42 40% 46%;
+    --secondary: 42 52% 68%;
+    --secondary-soft: 42 60% 80%;
+    --accent: 42 52% 68%;
+    --muted: 220 14% 16%;
+    --muted-foreground: 220 10% 72%;
+    --border: 220 14% 15%;
+    --input: 220 14% 15%;
+    --sidebar-background: 220 24% 4%;
+    --sidebar-accent: 220 18% 10%;
+    --sidebar-border: 220 14% 13%;
+    --gradient-parchment: radial-gradient(1200px 600px at 80% -10%, hsl(42 52% 68% / 0.07), transparent 60%),
+                          linear-gradient(180deg, hsl(220 22% 5%), hsl(220 20% 6%));
+  }
+
+  /* Parchment — the family paper, pushed warmer and more saturated. */
+  [data-skin="parchment"] {
+    --background: 40 46% 92%;
+    --surface-raised: 42 52% 96%;
+    --surface-veil: 38 34% 85%;
+    --foreground: 28 24% 20%;
+    --primary: 28 24% 20%;
+    --primary-deep: 26 30% 12%;
+    --secondary: 34 46% 58%;
+    --secondary-soft: 36 54% 72%;
+    --accent: 34 46% 58%;
+    --muted: 38 32% 87%;
+    --muted-foreground: 28 16% 38%;
+    --border: 36 26% 79%;
+    --input: 36 26% 79%;
+    --ring: 34 46% 58%;
+    --card: 42 56% 97%;
+    --sidebar-background: 26 30% 12%;
+    --sidebar-accent: 28 20% 19%;
+    --sidebar-border: 28 18% 21%;
+    --gradient-parchment: radial-gradient(1100px 560px at 78% -10%, hsl(34 46% 58% / 0.14), transparent 60%),
+                          linear-gradient(180deg, hsl(41 48% 94%), hsl(39 44% 90%));
+  }
+  [data-skin="parchment"].dark {
+    --background: 28 16% 8%;
+    --surface-raised: 30 14% 12%;
+    --surface-veil: 30 12% 15%;
+    --foreground: 40 26% 88%;
+    --card: 30 14% 10%;
+    --primary: 34 48% 66%;
+    --primary-deep: 34 40% 44%;
+    --secondary: 34 48% 66%;
+    --secondary-soft: 36 56% 78%;
+    --accent: 34 48% 66%;
+    --muted: 30 10% 18%;
+    --muted-foreground: 38 16% 72%;
+    --border: 30 10% 17%;
+    --input: 30 10% 17%;
+    --sidebar-background: 28 18% 6%;
+    --sidebar-accent: 30 12% 12%;
+    --sidebar-border: 30 10% 15%;
+  }
+
+  /* Sepia — Chiron's leather lent to the whole hub. */
+  [data-skin="sepia"] {
+    --background: 34 30% 91%;
+    --surface-raised: 36 36% 95%;
+    --surface-veil: 32 22% 84%;
+    --foreground: 22 32% 18%;
+    --primary: 22 32% 18%;
+    --primary-deep: 20 38% 11%;
+    --secondary: 18 34% 48%;
+    --secondary-soft: 20 40% 64%;
+    --accent: 18 34% 48%;
+    --muted: 32 20% 86%;
+    --muted-foreground: 22 18% 36%;
+    --border: 30 18% 78%;
+    --input: 30 18% 78%;
+    --ring: 18 34% 48%;
+    --card: 36 40% 96%;
+    --sidebar-background: 20 38% 11%;
+    --sidebar-accent: 22 24% 18%;
+    --sidebar-border: 22 20% 20%;
+    --gradient-parchment: radial-gradient(1100px 560px at 78% -10%, hsl(18 34% 48% / 0.10), transparent 60%),
+                          linear-gradient(180deg, hsl(34 32% 93%), hsl(32 28% 89%));
+  }
+  [data-skin="sepia"].dark {
+    --background: 22 20% 7%;
+    --surface-raised: 22 16% 11%;
+    --surface-veil: 22 14% 14%;
+    --foreground: 34 22% 87%;
+    --card: 22 16% 9%;
+    --primary: 20 44% 62%;
+    --primary-deep: 20 36% 42%;
+    --secondary: 20 44% 62%;
+    --secondary-soft: 22 50% 74%;
+    --accent: 20 44% 62%;
+    --muted: 22 12% 17%;
+    --muted-foreground: 32 14% 70%;
+    --border: 22 12% 16%;
+    --input: 22 12% 16%;
+    --sidebar-background: 22 22% 5%;
+    --sidebar-accent: 22 14% 11%;
+    --sidebar-border: 22 12% 14%;
+  }
+
+  /* Ink — near-monochrome, maximum contrast, for long sessions. */
+  [data-skin="ink"] {
+    --background: 0 0% 97%;
+    --surface-raised: 0 0% 100%;
+    --surface-veil: 0 0% 91%;
+    --foreground: 0 0% 9%;
+    --primary: 0 0% 9%;
+    --primary-deep: 0 0% 4%;
+    --secondary: 0 0% 42%;
+    --secondary-soft: 0 0% 62%;
+    --accent: 0 0% 42%;
+    --muted: 0 0% 93%;
+    --muted-foreground: 0 0% 34%;
+    --border: 0 0% 86%;
+    --input: 0 0% 86%;
+    --ring: 0 0% 42%;
+    --card: 0 0% 100%;
+    --sidebar-background: 0 0% 6%;
+    --sidebar-foreground: 0 0% 88%;
+    --sidebar-accent: 0 0% 14%;
+    --sidebar-border: 0 0% 16%;
+    --gradient-gilt: linear-gradient(135deg, hsl(0 0% 30%) 0%, hsl(0 0% 12%) 100%);
+    --gradient-parchment: linear-gradient(180deg, hsl(0 0% 98%), hsl(0 0% 95%));
+  }
+  [data-skin="ink"].dark {
+    --background: 0 0% 4%;
+    --surface-raised: 0 0% 8%;
+    --surface-veil: 0 0% 12%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 6%;
+    --primary: 0 0% 95%;
+    --primary-foreground: 0 0% 6%;
+    --primary-deep: 0 0% 70%;
+    --secondary: 0 0% 72%;
+    --secondary-soft: 0 0% 86%;
+    --accent: 0 0% 72%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 70%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
+    --sidebar-background: 0 0% 3%;
+    --sidebar-accent: 0 0% 10%;
+    --sidebar-border: 0 0% 13%;
+    --gradient-gilt: linear-gradient(135deg, hsl(0 0% 92%) 0%, hsl(0 0% 74%) 100%);
+    --gradient-parchment: linear-gradient(180deg, hsl(0 0% 4%), hsl(0 0% 5%));
+  }
+}
+
+/* ── Density ──────────────────────────────────────────────────────────────────
+   One knob, read by the dense-* helpers rather than by every component:
+   compact trims the page rhythm, it does not shrink type below 12px. */
+@layer base {
+  :root { --gap-page: 2rem; --gap-block: 1.25rem; --pad-card: 1.25rem; }
+  [data-density="compact"] { --gap-page: 1.25rem; --gap-block: 0.75rem; --pad-card: 0.875rem; }
+}
+
+@layer components {
+  .dense-page { padding: var(--gap-page); }
+  .dense-gap { gap: var(--gap-block); }
+  .dense-card { padding: var(--pad-card); }
+
+  /* A panel wears its app color as a hairline wash on the header only —
+     never a left-border stripe (SUITE-ARCHITECTURE section 5). */
+  .panel-shell {
+    @apply flex min-h-0 flex-col overflow-hidden rounded-xl border bg-card;
+    box-shadow: var(--shadow-soft);
+  }
+  .panel-header {
+    @apply flex items-center gap-2 border-b px-4 py-3;
+    background: linear-gradient(180deg, var(--panel-tint, transparent), transparent);
+  }
+}
+
+/* ── Brand motion ─────────────────────────────────────────────────────────────
+   The mark draws itself: slopes climb from the base, the entablature wipes
+   across, the keystone lands last. Every path carries pathLength="1", so the
+   dash math is the same regardless of geometry. The whole block is inert under
+   prefers-reduced-motion — the base rule in @layer base zeroes the durations,
+   and the explicit reset below makes sure nothing is left mid-draw. */
+@layer components {
+  .mark-animated .mark-slopes {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: mark-draw 900ms var(--ease-editorial) forwards;
+  }
+  .mark-animated .mark-bar {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: mark-draw 420ms var(--ease-editorial) 620ms forwards;
+  }
+  .mark-animated .mark-keystone {
+    transform-origin: 32px 9.5px;
+    transform: scale(0);
+    animation: mark-keystone 520ms var(--ease-editorial) 900ms forwards;
+  }
+
+  @keyframes mark-draw {
+    to { stroke-dashoffset: 0; }
+  }
+  @keyframes mark-keystone {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.35); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  /* The wheel's one moving part: a gilt arc travelling the ring. Slow enough
+     to read as ambient rather than as a spinner. */
+  .wheel-sweep {
+    transform-origin: 50px 50px;
+    animation: wheel-sweep 22s linear infinite;
+  }
+  @keyframes wheel-sweep {
+    to { transform: rotate(360deg); }
+  }
+
+  /* The hub panel cross-fades when a different spoke takes over. */
+  .wheel-panel { animation: wheel-panel 320ms var(--ease-editorial); }
+  @keyframes wheel-panel {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* The wordmark arrives after the keystone lands, letter-spacing settling in
+     rather than a plain fade — the type does the same "assembling" the mark
+     just did. */
+  .boot-wordmark {
+    opacity: 0;
+    animation: boot-wordmark 700ms var(--ease-editorial) 1080ms forwards;
+  }
+  @keyframes boot-wordmark {
+    from { opacity: 0; letter-spacing: 0.5em; }
+    to { opacity: 1; letter-spacing: 0.24em; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mark-animated .mark-slopes,
+    .mark-animated .mark-bar { stroke-dashoffset: 0; }
+    .mark-animated .mark-keystone { transform: scale(1); opacity: 1; }
+    .boot-wordmark { opacity: 1; }
+  }
+}
+
+@layer utilities {
+  /* Text that is still streaming in — a slow gilt sheen, no layout cost. */
+  .shimmer-text {
+    background: linear-gradient(90deg,
+      hsl(var(--muted-foreground)) 0%,
+      hsl(var(--secondary)) 40%,
+      hsl(var(--muted-foreground)) 80%);
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: olympus-shimmer 2.4s linear infinite;
+  }
+  @keyframes thinking-dot {
+    0%, 100% { opacity: 0.25; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(-2px); }
+  }
+  @keyframes olympus-shimmer {
+    from { background-position: 120% 0; }
+    to { background-position: -120% 0; }
+  }
+  .scrollbar-slim { scrollbar-width: thin; scrollbar-color: hsl(var(--border)) transparent; }
+  .scrollbar-slim::-webkit-scrollbar { width: 8px; height: 8px; }
+  .scrollbar-slim::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 8px; }
+  .scrollbar-slim::-webkit-scrollbar-track { background: transparent; }
+}

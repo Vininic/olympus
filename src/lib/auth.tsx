@@ -99,7 +99,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [supabase]);
 
   return (
-    <AuthCtx.Provider value={{ session, signIn, signUp, signOut, updateName, isCloud: !!supabase }}>
+    // `isCloud` means "this session reads and writes cloud data", not "a
+    // Supabase client exists". The old form (`!!supabase`) was true for guests
+    // too, so guest sessions were treated as accounts everywhere — no guest
+    // notice on Home, and prefs trying to push to a row nobody owns.
+    <AuthCtx.Provider value={{ session, signIn, signUp, signOut, updateName, isCloud: !!supabase && !!session?.email }}>
       {children}
     </AuthCtx.Provider>
   );

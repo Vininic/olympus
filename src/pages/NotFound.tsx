@@ -14,7 +14,7 @@ export default function NotFound() {
       description={n.lead}
       action={
         <Button asChild>
-          <Link to="/desk"><ArrowLeft className="mr-2 h-4 w-4" /> {n.backToApp}</Link>
+          <Link to="/app"><ArrowLeft className="mr-2 h-4 w-4" /> {n.backToApp}</Link>
         </Button>
       }
     />

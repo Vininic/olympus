@@ -1,36 +1,71 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import {
-  CircleHelp, Cloud, LayoutDashboard, Menu, MessageSquareQuote, MonitorSmartphone,
-  PanelLeftClose, Settings2, Sparkles,
+  Blocks, CircleHelp, Cloud, FolderOpen, Home, Menu, MessageSquare, MonitorSmartphone,
+  PanelLeftClose, Settings2,
 } from "lucide-react";
-import Logo, { OlympusMark } from "@/components/OlympusLogo";
-import ProfileDialog from "@/components/ProfileDialog";
+import Logo, { OlympusMark } from "@/components/brand/OlympusMark";
 import Topbar from "@/components/Topbar";
+import { SettingsDialog } from "@/components/settings/SettingsDialog";
+import { AboutDialog } from "@/components/about/AboutDialog";
+import { CommandPalette, useCommandPaletteShortcut } from "@/components/ui/CommandPalette";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useAuth } from "@/lib/auth";
-import { useT } from "@/lib/i18n/I18nProvider";
+import { usePrefs } from "@/lib/prefs/store";
+import { Avatar } from "@/components/account/Avatar";
+import { useHub, useT } from "@/lib/i18n/I18nProvider";
 import { cn } from "@/lib/utils";
 
-function UserBlock({ collapsed, onOpen }: { collapsed: boolean; onOpen: () => void }) {
+/** Home and Chat are the two primary tabs — the Teams "tab priority" rule from
+ *  the reference set: the most relevant surface comes first, and secondary
+ *  destinations must not compete with them visually. Settings is a dialog, not
+ *  a tab, for the same reason. */
+function useNavGroups() {
+  const h = useHub();
+  return {
+    primary: [
+      { to: "/home", label: h.nav.home, icon: Home },
+      { to: "/chat", label: h.nav.chat, icon: MessageSquare },
+    ],
+    workspace: [
+      { to: "/files", label: h.nav.files, icon: FolderOpen },
+      { to: "/apps", label: h.nav.apps, icon: Blocks },
+    ],
+  };
+}
+
+function SectionLabel({ collapsed, children }: { collapsed: boolean; children: string }) {
+  return (
+    <div
+      className={cn(
+        "mb-2 mt-7 px-3 text-[10px] uppercase tracking-[0.22em] text-sidebar-foreground/50",
+        collapsed && "hidden",
+      )}
+    >
+      {children}
+    </div>
+  );
+}
+
+function UserBlock({ collapsed }: { collapsed: boolean }) {
   const { session } = useAuth();
+  const { prefs } = usePrefs();
   const t = useT();
   if (!session) return null;
   const cloud = !!session.email;
-  const initial = session.name.trim().charAt(0).toUpperCase() || "O";
 
   return (
-    <button
-      type="button"
-      onClick={onOpen}
-      className={cn(
-        "flex w-full items-center gap-2.5 rounded-lg border border-sidebar-border bg-sidebar-accent/50 p-2.5 text-left transition-colors hover:bg-sidebar-accent",
-        collapsed && "justify-center border-0 bg-transparent p-0 hover:bg-transparent",
-      )}
+    <NavLink
+      to="/account"
+      className={({ isActive }) =>
+        cn(
+          "flex w-full items-center gap-2.5 rounded-lg border border-sidebar-border bg-sidebar-accent/50 p-2.5 text-left transition-colors hover:bg-sidebar-accent",
+          isActive && "border-sidebar-ring/40 bg-sidebar-accent",
+          collapsed && "justify-center border-0 bg-transparent p-0 hover:bg-transparent",
+        )
+      }
     >
-      <div className="font-display grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gilt font-semibold text-primary-deep">
-        {initial}
-      </div>
+      <Avatar avatar={prefs.avatar} name={session.name} size={32} />
       {!collapsed && (
         <div className="min-w-0 flex-1">
           <div className="truncate text-sm text-sidebar-foreground">{session.name}</div>
@@ -40,48 +75,61 @@ function UserBlock({ collapsed, onOpen }: { collapsed: boolean; onOpen: () => vo
           </div>
         </div>
       )}
-    </button>
+    </NavLink>
   );
+}
+
+/** The mobile header's avatar. Split out so `AppLayout` does not need the
+ *  prefs hook purely to draw 32 pixels. */
+function MobileAvatar() {
+  const { session } = useAuth();
+  const { prefs } = usePrefs();
+  return <Avatar avatar={prefs.avatar} name={session?.name} size={32} />;
 }
 
 export default function AppLayout() {
   const { session } = useAuth();
   const t = useT();
-  const nav = t.olympus.nav;
+  const h = useHub();
   const location = useLocation();
+  const groups = useNavGroups();
   const [collapsed, setCollapsed] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const initial = session?.name.trim().charAt(0).toUpperCase() || "O";
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  useCommandPaletteShortcut(useCallback(() => setPaletteOpen(true), []));
 
-  const fullHeight = location.pathname === "/oracle";
+  // Chat and Home fill the viewport and own their scrolling — the dashboard is
+  // a fixed grid whose tiles scroll internally, so a page scrollbar on top of
+  // that would be two scrolls competing. Everything else scrolls normally.
+  const fullHeight = location.pathname === "/chat" || location.pathname === "/home";
 
-  const navClass = ({ isActive }: { isActive: boolean }) =>
+  const primaryClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors",
+      "group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
       isActive
-        ? "bg-sidebar-accent text-sidebar-accent-foreground"
-        : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+        ? "bg-sidebar-accent text-sidebar-accent-foreground ring-1 ring-sidebar-ring/30"
+        : "text-sidebar-foreground/85 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
       collapsed && "justify-center px-0",
     );
 
-  const mobileNavClass = ({ isActive }: { isActive: boolean }) =>
+  const secondaryClass = ({ isActive }: { isActive: boolean }) =>
     cn(
-      "flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors",
+      "group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
       isActive
-        ? "bg-sidebar-accent text-sidebar-accent-foreground"
-        : "text-sidebar-foreground/80 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
+        ? "bg-sidebar-accent/70 text-sidebar-accent-foreground"
+        : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+      collapsed && "justify-center px-0",
     );
 
-  const main = [
-    { to: "/desk", label: nav.desk, icon: LayoutDashboard },
-    { to: "/oracle", label: nav.oracle, icon: MessageSquareQuote },
-    { to: "/apps", label: nav.apps, icon: MonitorSmartphone },
-  ];
-  const system = [
-    { to: "/settings", label: nav.settings, icon: Settings2 },
-    { to: "/about", label: nav.about, icon: CircleHelp },
-  ];
+  const renderNav = (itemClass: typeof primaryClass, items: { to: string; label: string; icon: typeof Home }[], onClick?: () => void) =>
+    items.map(({ to, label, icon: Icon }) => (
+      <NavLink key={to} to={to} className={itemClass} title={collapsed ? label : undefined} onClick={onClick}>
+        <Icon className="h-4 w-4 shrink-0 text-secondary-soft" />
+        {!collapsed && <span className="flex-1">{label}</span>}
+      </NavLink>
+    ));
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
@@ -91,12 +139,12 @@ export default function AppLayout() {
           collapsed ? "w-[72px]" : "w-60",
         )}
       >
-        <div className={cn("flex items-center pt-5 pb-4", collapsed ? "justify-center px-0" : "justify-between px-5")}>
+        <div className={cn("flex items-center pb-4 pt-5", collapsed ? "justify-center px-0" : "justify-between px-5")}>
           {!collapsed && <Logo variant="light" />}
           <button
             type="button"
             onClick={() => setCollapsed(!collapsed)}
-            title={collapsed ? nav.expand : nav.collapse}
+            title={collapsed ? h.nav.expand : h.nav.collapse}
             className="grid h-7 w-7 place-items-center rounded-md text-sidebar-foreground/40 transition-all duration-300 hover:bg-sidebar-accent/60 hover:text-sidebar-foreground/70"
           >
             <PanelLeftClose className={cn("h-4 w-4 transition-transform duration-300", collapsed && "rotate-180")} />
@@ -105,108 +153,127 @@ export default function AppLayout() {
         {!collapsed && <div className="gilt-rule mx-4" />}
 
         <nav className="flex-1 overflow-y-auto px-3 py-4">
-          {main.map(({ to, label, icon: Icon }) => (
-            <NavLink key={to} to={to} className={navClass} title={collapsed ? label : undefined}>
-              <Icon className="h-4 w-4 shrink-0 text-secondary-soft" />
-              {!collapsed && <span className="flex-1">{label}</span>}
-            </NavLink>
-          ))}
-          <NavLink to="/oracle" className={navClass} title={collapsed ? nav.aetheris : undefined}>
-            <Sparkles className="h-4 w-4 shrink-0 text-secondary-soft" />
-            {!collapsed && <span>{nav.aetheris}</span>}
-          </NavLink>
+          <div className="flex flex-col gap-1">{renderNav(primaryClass, groups.primary)}</div>
 
-          <div className={cn("mb-2 mt-7 px-3 text-[10px] uppercase tracking-[0.22em] text-sidebar-foreground/50", collapsed && "hidden")}>
-            {nav.system}
+          <SectionLabel collapsed={collapsed}>{h.nav.workspace}</SectionLabel>
+          <div className="flex flex-col gap-0.5">{renderNav(secondaryClass, groups.workspace)}</div>
+
+          {/* System section — the same slot every sibling puts Settings and
+              About in. Olympus keeps the dialog (it is the better surface) but
+              stops inventing its own location for the entry point. */}
+          <SectionLabel collapsed={collapsed}>{h.nav.system}</SectionLabel>
+          <div className="flex flex-col gap-0.5">
+            <button
+              type="button"
+              onClick={() => setSettingsOpen(true)}
+              title={collapsed ? h.nav.settings : undefined}
+              className={cn(secondaryClass({ isActive: false }), "w-full text-left")}
+            >
+              <Settings2 className="h-4 w-4 shrink-0" />
+              {!collapsed && <span className="flex-1">{h.nav.settings}</span>}
+            </button>
+            <button
+              type="button"
+              onClick={() => setAboutOpen(true)}
+              title={collapsed ? h.nav.about : undefined}
+              className={cn(secondaryClass({ isActive: false }), "w-full text-left")}
+            >
+              <CircleHelp className="h-4 w-4 shrink-0" />
+              {!collapsed && <span className="flex-1">{h.nav.about}</span>}
+            </button>
           </div>
-          {system.map(({ to, label, icon: Icon }) => (
-            <NavLink key={to} to={to} className={navClass} title={collapsed ? label : undefined}>
-              <Icon className="h-4 w-4 shrink-0" />
-              {!collapsed && <span>{label}</span>}
-            </NavLink>
-          ))}
         </nav>
 
         <div className="px-3 pb-4 pt-2">
-          <UserBlock collapsed={collapsed} onOpen={() => setProfileOpen(true)} />
+          <UserBlock collapsed={collapsed} />
         </div>
       </aside>
 
-      <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} />
+      <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
+      <AboutDialog open={aboutOpen} onOpenChange={setAboutOpen} />
+      <CommandPalette
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        onOpenSettings={() => setSettingsOpen(true)}
+      />
 
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <header className="flex items-center justify-between border-b border-sidebar-border bg-sidebar px-4 py-3 md:hidden">
           <div className="flex items-center gap-1.5">
             <button
               type="button"
-              aria-label={nav.openMenu}
+              aria-label={h.nav.openMenu}
               onClick={() => setMobileNavOpen(true)}
               className="grid h-8 w-8 place-items-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent"
             >
               <Menu className="h-5 w-5" />
             </button>
-            <NavLink to="/desk"><Logo variant="light" /></NavLink>
+            <NavLink to="/home"><Logo variant="light" /></NavLink>
           </div>
           <div className="flex items-center gap-2">
-            <NavLink to="/oracle" aria-label={nav.aetheris} className="grid h-8 w-8 place-items-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent">
-              <Sparkles className="h-4 w-4" />
-            </NavLink>
-            <NavLink to="/settings" aria-label={nav.settings} className="grid h-8 w-8 place-items-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent">
-              <Settings2 className="h-4 w-4" />
-            </NavLink>
-            <button
-              type="button"
-              aria-label={nav.profile}
-              onClick={() => setProfileOpen(true)}
-              className="font-display grid h-8 w-8 shrink-0 place-items-center rounded-full bg-gilt text-xs font-semibold text-primary-deep"
+            <NavLink
+              to="/chat"
+              aria-label={h.nav.chat}
+              className="grid h-8 w-8 place-items-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent"
             >
-              {initial}
-            </button>
+              <MessageSquare className="h-4 w-4" />
+            </NavLink>
+            <NavLink to="/account" aria-label={h.nav.account} className="shrink-0">
+              <MobileAvatar />
+            </NavLink>
           </div>
         </header>
 
         <Sheet open={mobileNavOpen} onOpenChange={setMobileNavOpen}>
           <SheetContent side="left" className="flex w-72 flex-col gap-0 border-sidebar-border bg-sidebar p-0 text-sidebar-foreground">
-            <SheetTitle className="sr-only">{nav.desk}</SheetTitle>
-            <div className="px-5 pb-4 pt-5">
-              <Logo variant="light" />
-            </div>
+            <SheetTitle className="sr-only">{h.nav.home}</SheetTitle>
+            <div className="px-5 pb-4 pt-5"><Logo variant="light" /></div>
             <div className="gilt-rule mx-4" />
             <nav className="flex-1 overflow-y-auto px-3 py-4">
-              {main.map(({ to, label, icon: Icon }) => (
-                <NavLink key={to} to={to} onClick={() => setMobileNavOpen(false)} className={mobileNavClass}>
-                  <Icon className="h-4 w-4 shrink-0 text-secondary-soft" />
-                  <span className="flex-1">{label}</span>
-                </NavLink>
-              ))}
-              <NavLink to="/oracle" onClick={() => setMobileNavOpen(false)} className={mobileNavClass}>
-                <Sparkles className="h-4 w-4 shrink-0 text-secondary-soft" />
-                <span>{nav.aetheris}</span>
-              </NavLink>
-
-              <div className="mb-2 mt-7 px-3 text-[10px] uppercase tracking-[0.22em] text-sidebar-foreground/50">
-                {nav.system}
+              <div className="flex flex-col gap-1">
+                {renderNav(primaryClass, groups.primary, () => setMobileNavOpen(false))}
               </div>
-              {system.map(({ to, label, icon: Icon }) => (
-                <NavLink key={to} to={to} onClick={() => setMobileNavOpen(false)} className={mobileNavClass}>
-                  <Icon className="h-4 w-4 shrink-0" />
-                  <span>{label}</span>
-                </NavLink>
-              ))}
+              <SectionLabel collapsed={false}>{h.nav.workspace}</SectionLabel>
+              <div className="flex flex-col gap-0.5">
+                {renderNav(secondaryClass, groups.workspace, () => setMobileNavOpen(false))}
+              </div>
+
+              <SectionLabel collapsed={false}>{h.nav.system}</SectionLabel>
+              <div className="flex flex-col gap-0.5">
+                <button
+                  type="button"
+                  onClick={() => { setMobileNavOpen(false); setSettingsOpen(true); }}
+                  className={cn(secondaryClass({ isActive: false }), "w-full text-left")}
+                >
+                  <Settings2 className="h-4 w-4 shrink-0" />
+                  <span className="flex-1">{h.nav.settings}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setMobileNavOpen(false); setAboutOpen(true); }}
+                  className={cn(secondaryClass({ isActive: false }), "w-full text-left")}
+                >
+                  <CircleHelp className="h-4 w-4 shrink-0" />
+                  <span className="flex-1">{h.nav.about}</span>
+                </button>
+              </div>
             </nav>
+            <div className="px-3 pb-4">
+              <UserBlock collapsed={false} />
+            </div>
           </SheetContent>
         </Sheet>
 
-        <Topbar />
+        <Topbar onOpenPalette={() => setPaletteOpen(true)} />
 
         <main className={cn("olympus-surface flex-1 overflow-y-auto", fullHeight && "flex flex-col overflow-hidden")}>
           {fullHeight ? (
-            <div className="h-full min-h-0 p-5 lg:p-8">
+            <div className="dense-page h-full min-h-0">
               <Outlet />
             </div>
           ) : (
             <div className="flex min-h-full flex-col">
-              <div className="flex-1 p-5 lg:p-8">
+              <div className="dense-page flex-1">
                 <Outlet />
               </div>
               <footer className="flex items-center justify-center gap-2 py-6 text-[11px] uppercase tracking-[0.22em] text-muted-foreground">

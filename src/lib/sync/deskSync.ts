@@ -7,16 +7,17 @@ import { toast } from "sonner";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useT } from "@/lib/i18n/I18nProvider";
+import { SUITE_APPS } from "@/lib/suite/registry";
 
 const TABLE = "user_data";
 
-export const DESK_DOMAINS = [
-  { key: "schedule", storageKey: "olympus.view.chronos" },
-  { key: "kairos-board", storageKey: "olympus.view.kairos" },
-  { key: "pluto-ledger", storageKey: "olympus.view.pluto" },
-  { key: "hermes-outbox", storageKey: "olympus.view.hermes" },
-  { key: "chiron-index", storageKey: "olympus.view.chiron" },
-] as const;
+/** Derived from the registry rather than restated here — the two lists had
+ *  already been written twice, and a key that drifts means a panel that
+ *  silently reads nothing. */
+export const DESK_DOMAINS = SUITE_APPS.map((app) => ({
+  key: app.dataKey,
+  storageKey: app.storageKey,
+}));
 
 export const DESK_PULLED_EVENT = "olympus-desk-pulled";
 
